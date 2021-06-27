@@ -1,58 +1,72 @@
 #include <iostream>
-#include <windows.h>
+#include<conio.h>
+#include<ctime>
+
+#include "Snake.h"
+#include "Food.h"
+
+
+#define WIDTH 50
+#define HEIGHT 25
+
 using namespace std;
 
+Snake snake({WIDTH/2, HEIGHT/2}, 1);
+Food food;
+
+int x = 10,y = 10;
+
+void board()
+{
+    COORD snake_pos = snake.get_pos();
+    COORD food_pos=food.get_pos();
+
+     for(int i=0 ; i< HEIGHT; i++)
+    {
+
+    cout<<"\t\t#";
+
+    for(int j = 0 ; j < WIDTH -2; j++)
+    {
+
+        if(i == 0 || i == HEIGHT-1) cout<<'#';
+        else if(i ==snake_pos.Y && j == snake_pos.X) cout<<'0';
+        else if(i ==food_pos.Y && j == food_pos.X)  cout<<'*';
+        else cout<<" ";
+
+    }
+    cout<<"#\n";
+}
+}
 int main()
 {
-    int h,m,s,a, err;
-
-    err = a = 0;
-
-    while( err == 0)
+    srand(time(NULL));
+    bool game_over = false;
+    while(!game_over)
     {
 
-        cout<<"Enter hour : "<<endl;
-        cin>>h;
-
-        cout<<"Enter minutes : "<<endl;
-        cin>>m ;
-
-        cout<<"Enter seconds : "<<endl;
-        cin<<s;
-
-        if(h<24&&m<60&&s<<60)
-
-            err++;
-
-        else
-            system("cls");
-
-    }
-
-    while(a == 0)
-
+    board();
+    if(kbhit())
     {
-        system("cls");
-            cout<<h<<":"<<m<<":"<<s<<endl;
-            Sleep(1000);
-            s++;
+        switch(getch())
+        {
+            case 'w': snake.change_dir('u');break;
+            case 'a': snake.change_dir('l');break;
+            case 's': snake.change_dir('d');break;
+            case 'd': snake.change_dir('r');break;
 
-      if(s>59)
-   {
-      s = 0;
-      m++;
-   }
-      if(m>59)
+        }
+    }
+    snake.move_snake();
+
+    if(snake.eaten(food.get_pos()))
     {
-       m = 0;
-       h++;
+        food.gen_food();
+        snake.grow();
     }
 
-    if(h > 24)
-    {
-        h = 0;
-    }
+    if(snake.collided()) game_over = true;
 
-    }
-    return 0;
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {0,0});
+}
 }
